@@ -1,11 +1,18 @@
-import { useState } from "react";
-import { List, ActionPanel, Action, Icon } from "@raycast/api";
+import { useState, useEffect } from "react";
+import { List, Icon, LocalStorage } from "@raycast/api";
 import { Streak } from "./types";
 
-const initialStreaks: Streak[] = []; // Fetch from storage or state
-
 export default function CheckStreaks() {
-  const [streaks, setStreaks] = useState<Streak[]>(initialStreaks);
+  const [streaks, setStreaks] = useState<Streak[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const storedStreaks = await LocalStorage.getItem<string>("streaks");
+      if (storedStreaks) {
+        setStreaks(JSON.parse(storedStreaks));
+      }
+    })();
+  }, []);
 
   return (
     <List>
@@ -15,23 +22,8 @@ export default function CheckStreaks() {
           title={streak.name}
           subtitle={`Progress: ${streak.progress} / ${streak.goal}`}
           icon={Icon.Star}
-          actions={
-            <ActionPanel>
-              <Action title="Log Streak" onAction={() => handleCheckIn(streak.id)} />
-            </ActionPanel>
-          }
         />
       ))}
     </List>
   );
-
-  function handleCheckIn(id: string) {
-    setStreaks(
-      streaks.map((streak) =>
-        streak.id === id
-          ? { ...streak, progress: streak.progress + 1, lastCheckInDate: new Date().toISOString() }
-          : streak,
-      ),
-    );
-  }
 }

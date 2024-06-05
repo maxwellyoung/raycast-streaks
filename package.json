@@ -1,32 +1,62 @@
 {
-  "name": "my-streaks-extension",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "raycast build"
-  },
-  "raycast": {
-    "schemaVersion": 1,
-    "title": "Streaks",
-    "commands": [
-      {
-        "name": "index",
-        "title": "Manage Streaks",
-        "mode": "view"
-      },
-      {
-        "name": "add-streak",
-        "title": "Add Streak",
-        "mode": "form"
-      },
-      {
-        "name": "check-streaks",
-        "title": "Check Streaks",
-        "mode": "view"
-      }
-    ]
-  },
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "streaks",
+  "title": "Streaks",
+  "description": "Track habits to build your streaks",
+  "icon": "command-icon.png",
+  "author": "maxwellyoung",
+  "categories": [
+    "Productivity"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "index",
+      "title": "Manage Streaks",
+      "mode": "view",
+      "description": "Manage your streaks"
+    },
+    {
+      "name": "addStreak",
+      "title": "Add Streak",
+      "mode": "view",
+      "description": "Add a new streak"
+    },
+    {
+      "name": "checkStreaks",
+      "title": "Check Streaks",
+      "mode": "view",
+      "description": "Check your streaks"
+    },
+    {
+      "name": "editStreak",
+      "title": "Edit Streak",
+      "mode": "view",
+      "description": "Edit a streak"
+    },
+    {
+      "name": "quickAddStreak",
+      "title": "Quick Add Streak",
+      "mode": "view",
+      "description": "Quick add progress to a streak"
+    }
+  ],
   "dependencies": {
-    "@raycast/api": "^1.0.0"
+    "@raycast/api": "^1.75.2"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
   }
 }

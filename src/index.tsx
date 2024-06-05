@@ -1,13 +1,35 @@
-import { useState } from "react";
-import { List, ActionPanel, Action, Icon, useNavigation } from "@raycast/api";
-import AddStreak from "./add-streak";
+import { useState, useEffect } from "react";
+import {
+  List,
+  ActionPanel,
+  Action,
+  Icon,
+  useNavigation,
+  showToast,
+  Toast,
+  confirmAlert,
+  LocalStorage,
+} from "@raycast/api";
+import AddStreak from "./addStreak";
+import EditStreak from "./editStreak";
 import { Streak } from "./types";
 
-const initialStreaks: Streak[] = [];
-
 export default function Command() {
-  const [streaks, setStreaks] = useState<Streak[]>(initialStreaks);
+  const [streaks, setStreaks] = useState<Streak[]>([]);
   const { push } = useNavigation();
+
+  useEffect(() => {
+    (async () => {
+      const storedStreaks = await LocalStorage.getItem<string>("streaks");
+      if (storedStreaks) {
+        setStreaks(JSON.parse(storedStreaks));
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    LocalStorage.setItem("streaks", JSON.stringify(streaks));
+  }, [streaks]);
 
   return (
     <List>
@@ -28,8 +50,12 @@ export default function Command() {
           icon={Icon.Star}
           actions={
             <ActionPanel>
-              <Action title="Check In" onAction={() => handleCheckIn(streak.id)} />
-              <Action title="Edit Streak" onAction={() => handleEditStreak(streak.id)} />
+              <Action title="Increment Streak" onAction={() => handleIncrementStreak(streak.id)} />
+              <Action title="Decrement Streak" onAction={() => handleDecrementStreak(streak.id)} />
+              <Action
+                title="Edit Streak"
+                onAction={() => push(<EditStreak streak={streak} onSave={handleEditStreak} />)}
+              />
               <Action title="Delete Streak" onAction={() => handleDeleteStreak(streak.id)} />
             </ActionPanel>
           }
@@ -42,21 +68,32 @@ export default function Command() {
     setStreaks([...streaks, newStreak]);
   }
 
-  function handleCheckIn(id: string) {
+  function handleIncrementStreak(id: string) {
+    setStreaks(streaks.map((streak) => (streak.id === id ? { ...streak, progress: streak.progress + 1 } : streak)));
+  }
+
+  function handleDecrementStreak(id: string) {
     setStreaks(
-      streaks.map((streak) =>
-        streak.id === id
-          ? { ...streak, progress: streak.progress + 1, lastCheckInDate: new Date().toISOString() }
-          : streak,
-      ),
+      streaks.map((streak) => (streak.id === id ? { ...streak, progress: Math.max(streak.progress - 1, 0) } : streak)),
     );
   }
 
-  function handleEditStreak(id: string) {
-    // Logic to edit streak
+  function handleEditStreak(updatedStreak: Streak) {
+    setStreaks(streaks.map((streak) => (streak.id === updatedStreak.id ? updatedStreak : streak)));
   }
 
-  function handleDeleteStreak(id: string) {
-    setStreaks(streaks.filter((streak) => streak.id !== id));
+  async function handleDeleteStreak(id: string) {
+    const confirmed = await confirmAlert({
+      title: "Delete Streak",
+      message: "Are you sure you want to delete this streak?",
+      primaryAction: {
+        title: "Delete",
+      },
+    });
+
+    if (confirmed) {
+      setStreaks(streaks.filter((streak) => streak.id !== id));
+      showToast(Toast.Style.Success, "Streak deleted successfully");
+    }
   }
 }
