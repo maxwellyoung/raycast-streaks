@@ -1,0 +1,32 @@
+{
+  "name": "my-streaks-extension",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "raycast build"
+  },
+  "raycast": {
+    "schemaVersion": 1,
+    "title": "Streaks",
+    "commands": [
+      {
+        "name": "index",
+        "title": "Manage Streaks",
+        "mode": "view"
+      },
+      {
+        "name": "add-streak",
+        "title": "Add Streak",
+        "mode": "form"
+      },
+      {
+        "name": "check-streaks",
+        "title": "Check Streaks",
+        "mode": "view"
+      }
+    ]
+  },
+  "dependencies": {
+    "@raycast/api": "^1.0.0"
+  }
+}
